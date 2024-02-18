@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace TripServiceKata.Exception
 {
-    [Serializable]
+    //[Serializable]
     public class DependendClassCallDuringUnitTestException : System.Exception
     {
         public DependendClassCallDuringUnitTestException() : base() { }

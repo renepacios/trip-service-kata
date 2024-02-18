@@ -2,7 +2,7 @@
 
 namespace TripServiceKata.Exception
 {
-    [Serializable]
+   // [Serializable]
     public class UserNotLoggedInException : System.Exception
     {
         
