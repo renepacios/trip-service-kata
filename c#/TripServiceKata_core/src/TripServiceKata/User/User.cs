@@ -25,6 +25,11 @@ namespace TripServiceKata.User
         public List<Trip.Trip> Trips()
         {
             return trips;
-        } 
+        }
+
+        public bool IsFriend(User friend)
+        {
+          return friends.Any() && friends.Contains(friend);
+        }
     }
 }
