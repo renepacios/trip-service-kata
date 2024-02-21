@@ -19,9 +19,9 @@
         public void not_allow_get_trips_WhenUserIsNotLoggedIn()
         {
             var tripService = new TestTripService();
-            var user = new User();
+            
             tripService
-                .Invoking(s => s.GetTripsByUser(user))
+                .Invoking(s => s.GetTripsByUser(ANOTHER_USER))
                 .Should()
                 .Throw<UserNotLoggedInException>();
 
@@ -31,12 +31,18 @@
         public void allow_get_trips_When_LoggedUser_Is_Friend()
         {
             var tripService = new TestTripService();
-            var user = new User();
             LOGGED_USER = new User();
-            user.AddFriend(FRIEND_USER);
-            user.AddFriend(LOGGED_USER);
-            user.AddTrip(GALICIA);
-            user.AddTrip(BARCELONA);
+            //var user = ANOTHER_USER;
+          
+            //user.AddFriend(FRIEND_USER);
+            //user.AddFriend(LOGGED_USER);
+            //user.AddTrip(GALICIA);
+            //user.AddTrip(BARCELONA);
+
+           var user= Builder.User
+                .WithFriends(FRIEND_USER, LOGGED_USER)
+                .WithTrips(GALICIA, BARCELONA)
+                .Build();
 
 
             var trips = tripService.GetTripsByUser(user);
@@ -47,26 +53,17 @@
         public void not_allow_get_trips_when_user_is_not_friend()
         {
             var tripService = new TestTripService();
-            var user = new User();
-            var friend = new User();
-            user.AddFriend(friend);
+            var user = ANOTHER_USER;
+            LOGGED_USER = new User();
+            user.AddFriend(FRIEND_USER);
+            user.AddTrip(GALICIA);
+            user.AddTrip(BARCELONA);
 
             var trips = tripService.GetTripsByUser(user);
             trips.Should().BeEmpty();
         }
 
-        [Fact]
-        public void ShouldReturnTripsWhenLoggedUserIsAFriend()
-        {
-            var tripService = new TestTripService();
-            var user = new User();
-            var friend = new User();
-            user.AddFriend(friend);
-            LOGGED_USER = friend;
 
-            var trips = tripService.GetTripsByUser(user);
-            trips.Should().NotBeEmpty();
-        }
 
         [Fact]
         public void AddFriend_should_be_work_as_expected()
@@ -74,8 +71,19 @@
             var user = new User();
             var friend = new User();
             user.AddFriend(friend);
-
             user.IsFriend(friend).Should().BeTrue();
+
+            //user.GetFriends().Should().Contain(friend);
+        }
+
+
+        [Fact]
+        public void Add_another_friend_should_be_work_as_expected()
+        {
+           var user=Builder.User
+               .WithFriends(ANOTHER_USER)
+               .Build();
+            user.IsFriend(FRIEND_USER).Should().BeFalse();
 
             //user.GetFriends().Should().Contain(friend);
         }
