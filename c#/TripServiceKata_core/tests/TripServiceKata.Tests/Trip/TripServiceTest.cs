@@ -7,10 +7,16 @@
 
     public class TripServiceTest
     {
+        public static User LOGGED_USER = null;
+        public static User FRIEND_USER = new User();
+        public static User ANOTHER_USER = new User();
+
+        public static Trip GALICIA = new Trip();
+        public static Trip BARCELONA = new Trip();
 
 
         [Fact]
-        public void ShouldThrowUserNotLoggedInExceptionWhenUserIsNotLoggedIn()
+        public void not_allow_get_trips_WhenUserIsNotLoggedIn()
         {
             var tripService = new TestTripService();
             var user = new User();
@@ -22,13 +28,29 @@
         }
 
         [Fact]
-        public void ShouldNotReturnTripsWhenLoggedUserIsNotAFriend()
+        public void allow_get_trips_When_LoggedUser_Is_Friend()
+        {
+            var tripService = new TestTripService();
+            var user = new User();
+            LOGGED_USER = new User();
+            user.AddFriend(FRIEND_USER);
+            user.AddFriend(LOGGED_USER);
+            user.AddTrip(GALICIA);
+            user.AddTrip(BARCELONA);
+
+
+            var trips = tripService.GetTripsByUser(user);
+            trips.Should().NotBeEmpty();
+        }
+
+        [Fact]
+        public void not_allow_get_trips_when_user_is_not_friend()
         {
             var tripService = new TestTripService();
             var user = new User();
             var friend = new User();
-            friend.AddFriend(user);
-            TestTripService.LOGGED_USER = friend;
+            user.AddFriend(friend);
+
             var trips = tripService.GetTripsByUser(user);
             trips.Should().BeEmpty();
         }
@@ -40,7 +62,7 @@
             var user = new User();
             var friend = new User();
             user.AddFriend(friend);
-            TestTripService.LOGGED_USER = friend;
+            LOGGED_USER = friend;
 
             var trips = tripService.GetTripsByUser(user);
             trips.Should().NotBeEmpty();
@@ -66,9 +88,7 @@
 
     public class TestTripService : TripService
     {
-        public static User LOGGED_USER = null;
-
-        public override User GetLoggedUser() => LOGGED_USER;
+        public override User GetLoggedUser() => TripServiceTest.LOGGED_USER;
 
         public override List<Trip> GetTripByUser(User user)
         {
